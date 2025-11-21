@@ -621,6 +621,13 @@
             justify-content: center;
             box-shadow: var(--shadow);
             cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .mobile-lang-toggle.hidden {
+            opacity: 0;
+            transform: translateX(-50%) translateY(-200%);
+            pointer-events: none;
         }
     </style>
 </head>
@@ -1082,7 +1089,25 @@
             applyLanguage();
             updateCategories();
             document.getElementById('transDate').valueAsDate = new Date();
+            initScrollBehavior();
             renderAll();
+        }
+
+        function initScrollBehavior() {
+            const mainContent = document.querySelector('.main-content');
+            const langBtn = document.querySelector('.mobile-lang-toggle');
+            let scrollTimeout;
+
+            mainContent.addEventListener('scroll', () => {
+                if (window.innerWidth <= 768) {
+                    langBtn.classList.add('hidden');
+                    
+                    clearTimeout(scrollTimeout);
+                    scrollTimeout = setTimeout(() => {
+                        langBtn.classList.remove('hidden');
+                    }, 800); // Show after 800ms of no scrolling
+                }
+            });
         }
 
         function loadData() {
