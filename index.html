@@ -656,6 +656,9 @@
             <li class="nav-item" onclick="switchView('planner')">
                 <i class="fas fa-calendar-alt"></i> <span data-i18n="planner">Planner</span>
             </li>
+            <li class="nav-item" onclick="switchView('settings')">
+                <i class="fas fa-cog"></i> <span data-i18n="settings">Settings</span>
+            </li>
         </ul>
         <div class="lang-container-desktop" style="margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border);">
             <button class="btn btn-outline" style="width: 100%; justify-content: center;" onclick="toggleLanguage()">
@@ -682,7 +685,12 @@
                     <div class="value" id="totalBalance">$0.00</div>
                 </div>
                 <div class="card stat-card">
-                    <h3 data-i18n="income">Income</h3>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <h3 data-i18n="income" style="margin-bottom: 0;">Income</h3>
+                        <button class="btn btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" onclick="openTransactionModal('income')" title="Add Income">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
                     <div class="value text-success" id="totalIncome">$0.00</div>
                 </div>
                 <div class="card stat-card">
@@ -830,6 +838,30 @@
                             <!-- Populated by JS -->
                         </tbody>
                     </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings View -->
+        <div id="settings" class="view-section">
+            <div class="header">
+                <h1 data-i18n="settings">Settings</h1>
+            </div>
+            
+            <div class="card">
+                <h3 data-i18n="dataManagement">Data Management</h3>
+                <p style="color: var(--text-muted); margin-bottom: 1rem;" data-i18n="dataDesc">Export your data to JSON for backup, or import an existing backup.</p>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <button class="btn btn-primary" onclick="exportData()">
+                        <i class="fas fa-download"></i> <span data-i18n="exportData">Export Data</span>
+                    </button>
+                    <button class="btn btn-outline" onclick="document.getElementById('importFile').click()">
+                        <i class="fas fa-upload"></i> <span data-i18n="importData">Import Data</span>
+                    </button>
+                    <input type="file" id="importFile" style="display: none" accept=".json" onchange="importData(this)">
+                    <button class="btn btn-danger" onclick="clearData()">
+                        <i class="fas fa-trash"></i> <span data-i18n="clearData">Clear All Data</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -1024,7 +1056,17 @@
                 cat_Salary: "Salary",
                 cat_Freelance: "Freelance",
                 cat_Investment: "Investment",
-                cat_Gift: "Gift"
+                cat_Gift: "Gift",
+                settings: "Settings",
+                dataManagement: "Data Management",
+                dataDesc: "Export your data to JSON for backup, or import an existing backup.",
+                exportData: "Export Data",
+                importData: "Import Data",
+                clearData: "Clear All Data",
+                dataExported: "Data exported successfully!",
+                dataImported: "Data imported successfully!",
+                confirmClear: "Are you sure you want to delete ALL data? This cannot be undone.",
+                invalidFile: "Invalid file format."
             },
             ar: {
                 appName: "مدير الميزانية",
@@ -1084,7 +1126,17 @@
                 cat_Salary: "راتب",
                 cat_Freelance: "عمل حر",
                 cat_Investment: "استثمار",
-                cat_Gift: "هدية"
+                cat_Gift: "هدية",
+                settings: "الإعدادات",
+                dataManagement: "إدارة البيانات",
+                dataDesc: "قم بتصدير بياناتك للنسخ الاحتياطي، أو استيراد نسخة احتياطية موجودة.",
+                exportData: "تصدير البيانات",
+                importData: "استيراد البيانات",
+                clearData: "مسح جميع البيانات",
+                dataExported: "تم تصدير البيانات بنجاح!",
+                dataImported: "تم استيراد البيانات بنجاح!",
+                confirmClear: "هل أنت متأكد أنك تريد حذف جميع البيانات؟ لا يمكن التراجع عن هذا.",
+                invalidFile: "تنسيق الملف غير صالح."
             }
         };
 
@@ -1571,6 +1623,51 @@
                     }
                 }
             });
+        }
+
+        // --- Data Management ---
+        function exportData() {
+            const dataStr = JSON.stringify(appData, null, 2);
+            const blob = new Blob([dataStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `budget_backup_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function importData(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data && (data.transactions || data.budgets)) {
+                        appData = data;
+                        saveData();
+                        renderAll();
+                        alert(translations[appData.language].dataImported);
+                    } else {
+                        alert(translations[appData.language].invalidFile);
+                    }
+                } catch (err) {
+                    alert(translations[appData.language].invalidFile);
+                }
+            };
+            reader.readAsText(file);
+            input.value = ''; // Reset
+        }
+
+        function clearData() {
+            if (confirm(translations[appData.language].confirmClear)) {
+                localStorage.removeItem('budget_app_data');
+                location.reload();
+            }
         }
 
         // Start App
