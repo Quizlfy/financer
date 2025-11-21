@@ -608,7 +608,8 @@
             display: none;
             position: fixed;
             top: 1rem;
-            right: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
             z-index: 1000;
             background: var(--surface);
             border: 1px solid var(--border);
@@ -620,11 +621,6 @@
             justify-content: center;
             box-shadow: var(--shadow);
             cursor: pointer;
-        }
-
-        body[dir="rtl"] .mobile-lang-toggle {
-            right: auto;
-            left: 1rem;
         }
     </style>
 </head>
