@@ -686,7 +686,12 @@
                     <div class="value text-success" id="totalIncome">$0.00</div>
                 </div>
                 <div class="card stat-card">
-                    <h3 data-i18n="expenses">Expenses</h3>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <h3 data-i18n="expenses" style="margin-bottom: 0;">Expenses</h3>
+                        <button class="btn btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" onclick="openTransactionModal('expense')" title="Add Expense">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
                     <div class="value text-danger" id="totalExpense">$0.00</div>
                 </div>
             </div>
@@ -1186,6 +1191,14 @@
         // --- Modals ---
         function openModal(modalId) {
             document.getElementById(modalId).classList.add('active');
+        }
+
+        function openTransactionModal(preselectType) {
+            openModal('transactionModal');
+            if (preselectType) {
+                document.getElementById('transType').value = preselectType;
+                updateCategories();
+            }
         }
 
         function closeModal(modalId) {
