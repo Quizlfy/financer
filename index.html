@@ -634,9 +634,7 @@
 <body>
 
     <!-- Mobile Language Toggle -->
-    <button class="mobile-lang-toggle" onclick="toggleLanguage()">
-        <i class="fas fa-globe"></i>
-    </button>
+    <!-- Removed -->
 
     <!-- Sidebar -->
     <aside class="sidebar">
@@ -660,11 +658,6 @@
                 <i class="fas fa-cog"></i> <span data-i18n="settings">Settings</span>
             </li>
         </ul>
-        <div class="lang-container-desktop" style="margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border);">
-            <button class="btn btn-outline" style="width: 100%; justify-content: center;" onclick="toggleLanguage()">
-                <i class="fas fa-globe"></i> <span id="langLabel">العربية</span>
-            </button>
-        </div>
     </aside>
 
     <!-- Main Content -->
@@ -848,6 +841,14 @@
                 <h1 data-i18n="settings">Settings</h1>
             </div>
             
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <h3 data-i18n="language">Language</h3>
+                <div style="display: flex; gap: 1rem;">
+                    <button class="btn btn-outline" onclick="setLanguage('en')" id="btn-en">English</button>
+                    <button class="btn btn-outline" onclick="setLanguage('ar')" id="btn-ar">العربية</button>
+                </div>
+            </div>
+
             <div class="card">
                 <h3 data-i18n="dataManagement">Data Management</h3>
                 <p style="color: var(--text-muted); margin-bottom: 1rem;" data-i18n="dataDesc">Export your data to JSON for backup, or import an existing backup.</p>
@@ -1058,6 +1059,7 @@
                 cat_Investment: "Investment",
                 cat_Gift: "Gift",
                 settings: "Settings",
+                language: "Language",
                 dataManagement: "Data Management",
                 dataDesc: "Export your data to JSON for backup, or import an existing backup.",
                 exportData: "Export Data",
@@ -1128,6 +1130,7 @@
                 cat_Investment: "استثمار",
                 cat_Gift: "هدية",
                 settings: "الإعدادات",
+                language: "اللغة",
                 dataManagement: "إدارة البيانات",
                 dataDesc: "قم بتصدير بياناتك للنسخ الاحتياطي، أو استيراد نسخة احتياطية موجودة.",
                 exportData: "تصدير البيانات",
@@ -1180,8 +1183,8 @@
             renderAll();
         }
 
-        function toggleLanguage() {
-            appData.language = appData.language === 'en' ? 'ar' : 'en';
+        function setLanguage(lang) {
+            appData.language = lang;
             saveData();
             applyLanguage();
         }
@@ -1205,7 +1208,22 @@
                 }
             });
 
-            document.getElementById('langLabel').innerText = t.langLabel;
+            // Update language buttons in settings
+            const btnEn = document.getElementById('btn-en');
+            const btnAr = document.getElementById('btn-ar');
+            if(btnEn && btnAr) {
+                if(lang === 'en') {
+                    btnEn.classList.add('btn-primary');
+                    btnEn.classList.remove('btn-outline');
+                    btnAr.classList.add('btn-outline');
+                    btnAr.classList.remove('btn-primary');
+                } else {
+                    btnAr.classList.add('btn-primary');
+                    btnAr.classList.remove('btn-outline');
+                    btnEn.classList.add('btn-outline');
+                    btnEn.classList.remove('btn-primary');
+                }
+            }
             
             // Re-render to update dynamic content (dates, etc)
             renderAll();
