@@ -40,7 +40,8 @@
             background-color: var(--background);
             color: var(--text-main);
             line-height: 1.5;
-            height: 100vh;
+            height: 100vh; /* Fallback */
+            height: 100dvh; /* Dynamic viewport height for mobile */
             display: flex;
             overflow: hidden;
         }
@@ -456,8 +457,9 @@
                 bottom: 0;
                 left: 0;
                 width: 100%;
-                height: auto;
+                height: calc(65px + env(safe-area-inset-bottom));
                 padding: 0.5rem;
+                padding-bottom: env(safe-area-inset-bottom);
                 flex-direction: row;
                 border-right: none;
                 border-top: 1px solid var(--border);
@@ -468,13 +470,15 @@
                 overflow-x: visible; /* No scroll */
             }
             
-            .logo { display: none; }
+            .logo, .lang-container-desktop { display: none !important; }
             
             .nav-links { 
                 flex-direction: row; 
                 width: 100%;
                 justify-content: space-around;
                 margin: 0;
+                height: 100%;
+                align-items: center;
             }
             
             .nav-item {
@@ -485,6 +489,7 @@
                 border-radius: 0.5rem;
                 background: transparent !important;
                 color: var(--text-muted);
+                justify-content: center;
             }
             
             .nav-item i {
@@ -499,8 +504,19 @@
             
             .main-content { 
                 padding: 1rem; 
-                padding-bottom: 80px; /* Space for bottom nav */
+                padding-bottom: calc(80px + env(safe-area-inset-bottom)); /* Space for bottom nav */
                 gap: 1rem;
+            }
+
+            /* Header adjustments */
+            .header .btn span {
+                display: none;
+            }
+            
+            .header .btn {
+                padding: 0.6rem;
+                aspect-ratio: 1;
+                justify-content: center;
             }
             
             .charts-container { 
@@ -581,10 +597,43 @@
                 text-align: right;
                 margin-left: 1rem;
             }
+
+            /* Mobile Language Toggle */
+            .mobile-lang-toggle {
+                display: flex !important;
+            }
+        }
+
+        .mobile-lang-toggle {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1000;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+        }
+
+        body[dir="rtl"] .mobile-lang-toggle {
+            right: auto;
+            left: 1rem;
         }
     </style>
 </head>
 <body>
+
+    <!-- Mobile Language Toggle -->
+    <button class="mobile-lang-toggle" onclick="toggleLanguage()">
+        <i class="fas fa-globe"></i>
+    </button>
 
     <!-- Sidebar -->
     <aside class="sidebar">
@@ -605,7 +654,7 @@
                 <i class="fas fa-calendar-alt"></i> <span data-i18n="planner">Planner</span>
             </li>
         </ul>
-        <div style="margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border);">
+        <div class="lang-container-desktop" style="margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border);">
             <button class="btn btn-outline" style="width: 100%; justify-content: center;" onclick="toggleLanguage()">
                 <i class="fas fa-globe"></i> <span id="langLabel">العربية</span>
             </button>
